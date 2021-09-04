@@ -32,7 +32,7 @@ Go modules:
 
 Modules:
 * Machines - module, that implements MachineAPI component itself
-* Contracts/Machines - module with set of dto, which are needed for using MachinesAPI
+* Contracts/Machines - module with set of dto, which are needed for using MachinesService
 
 ### How do I get set up? ###
 
