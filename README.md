@@ -1,29 +1,40 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+DUM - is a pet-project system for monitoring missing updates on the windows machines.
 
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* DUM relies on different set of data:
++ Windows Update service data of specific machine
++ WSUS deployment data
++ May be any other in the future
+
+So as this project is a pet-project, the author will try to use such patterns and principles like:
+* Clean architecture
+* Domain-Driven Development
+* Microservices
+* CQRS
+
+The practical scenarios that system should support are displayed at the following diagram:
+!(/diagrams/cases.jpg)
+
+The system consists of the following components:
+!(/diagrams/components.jpg)
+
+Components:
+* MachineService - service, allows to perform an operations with specific machine. Provides the ReportAPI interface, which is used for reporting about any updates, that are missing on the specific machine.
+
+Go modules:
+!(/diagrams/modules.jpg)
+
+Modules:
+*Machines - module, that implements MachineAPI component itself
+*Contracts/Machines - module with set of dto, which are needed for using MachinesAPI
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+For now, you can run only one microservice - MachineService by building from the source code.
 
 ### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+No contribution guideline yet
