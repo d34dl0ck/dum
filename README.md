@@ -4,16 +4,18 @@ DUM - is a pet-project system for monitoring missing updates on the windows mach
 
 ### What is this repository for? ###
 
-* DUM relies on different set of data:
-+ Windows Update service data of specific machine
-+ WSUS deployment data
-+ May be any other in the future
+DUM relies on different set of data:
+* Windows Update service data of specific machine
+* WSUS deployment data
+* May be any other in the future
 
 So as this project is a pet-project, the author will try to use such patterns and principles like:
 * Clean architecture
 * Domain-Driven Development
 * Microservices
 * CQRS
+* SOLID
+* GRASP
 
 The practical scenarios that system should support are displayed at the following diagram:
 
@@ -36,8 +38,8 @@ Modules:
 
 ### How do I get set up? ###
 
-For now, you can run only one microservice - MachineService by building from the source code.
+All you need is to follow the instructions for each microservice. It can be found at README.md of every directory with microservice code
 
 ### Contribution guidelines ###
 
-No contribution guideline yet
+There is no contribution guideline yet.
