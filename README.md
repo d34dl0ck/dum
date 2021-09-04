@@ -16,20 +16,20 @@ So as this project is a pet-project, the author will try to use such patterns an
 * CQRS
 
 The practical scenarios that system should support are displayed at the following diagram:
-!(/diagrams/cases.jpg)
+[Cases]!(/diagrams/cases.jpg)
 
 The system consists of the following components:
-!(/diagrams/components.jpg)
+[Components]!(/diagrams/components.jpg)
 
 Components:
 * MachineService - service, allows to perform an operations with specific machine. Provides the ReportAPI interface, which is used for reporting about any updates, that are missing on the specific machine.
 
 Go modules:
-!(/diagrams/modules.jpg)
+[Modules]!(/diagrams/modules.jpg)
 
 Modules:
-*Machines - module, that implements MachineAPI component itself
-*Contracts/Machines - module with set of dto, which are needed for using MachinesAPI
+* Machines - module, that implements MachineAPI component itself
+* Contracts/Machines - module with set of dto, which are needed for using MachinesAPI
 
 ### How do I get set up? ###
 
