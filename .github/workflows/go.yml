@@ -17,9 +17,18 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
+    
+    - name: Go to machines service contracts directory
+      run: cd src/contracts/machines
 
-    - name: Build
+    - name: Build machines service contracts
+      run: go build -v ./...
+    
+    - name: Go to machines service directory
+      run: cd ../../machines
+
+    - name: Build machines service
       run: go build -v ./...
 
-    - name: Test
+    - name: Test machines service
       run: go test -v ./...
