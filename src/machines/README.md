@@ -10,5 +10,5 @@ From the sequence diagram, we can form the 4-layered microservice, according to 
 
 ![Machines classes](/diagrams/machine_module.jpg)
 
-To create Docker image, please use make_image.bat.
+To create Docker image, please use make_image.ps1.
 To run microservice just build it and run the executable - no specific setup is needed.
