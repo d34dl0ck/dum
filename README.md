@@ -27,6 +27,7 @@ The system consists of the following components:
 
 Components:
 * MachineService - service, allows to perform an operations with specific machine. Provides the ReportAPI interface, which is used for reporting about any updates, that are missing on the specific machine.
+* WindowsReporter - script, which collects missing updates from client machine and sends it to MachineService via ReportAPI
 
 Go modules:
 
@@ -35,6 +36,7 @@ Go modules:
 Modules:
 * Machines - module, that implements MachineAPI component itself
 * Contracts/Machines - module with set of dto, which are needed for using MachinesService
+* Reporters/Windows - module with PowerShell script to get missed updates from windows machine
 
 ### How do I get set up? ###
 

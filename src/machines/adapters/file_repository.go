@@ -86,7 +86,7 @@ func (r *FileRepository) Save(machine *entities.Machine) error {
 		MissingUpdates: missingUpdateDtoSet,
 		Version:        uuid.NewString(),
 	}
-	dtoSet = append(dtoSet, machineDto)
+	dtoSet[machine.Name] = machineDto
 
 	raw, err := r.s(&dtoSet)
 	if err != nil {
@@ -101,17 +101,17 @@ func (r *FileRepository) Save(machine *entities.Machine) error {
 	return nil
 }
 
-func (r *FileRepository) loadAll() ([]machineDto, error) {
+func (r *FileRepository) loadAll() (map[string]machineDto, error) {
 	raw, err := r.fr(RepositoryFileName)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(raw) == 0 {
-		return []machineDto{}, nil
+		return map[string]machineDto{}, nil
 	}
 
-	var dtoSet []machineDto
+	var dtoSet map[string]machineDto
 	err = r.d(raw, &dtoSet)
 
 	if err != nil {

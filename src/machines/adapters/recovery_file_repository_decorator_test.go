@@ -3,6 +3,7 @@ package adapters
 import (
 	"dum/machines/entities"
 	"os"
+	"sync"
 	"testing"
 )
 
@@ -27,7 +28,7 @@ func TestShouldCreateFileIfDoesNotExistOnLoad(t *testing.T) {
 		t.Errorf("Expected error to be nil on result reading, but was %s", err)
 	}
 
-	if string(raw) != "[]" {
+	if string(raw) != "{}" {
 		t.Error("Unexpected content of result file!")
 	}
 
@@ -44,7 +45,7 @@ func TestShouldNotCreateFileIfExistsAndNotEmptyOnLoad(t *testing.T) {
 	}
 
 	defer os.Remove(RepositoryFileName)
-	file.WriteString("[]")
+	file.WriteString("{}")
 	file.Close()
 
 	repoMock := repositoryMock{}
@@ -93,7 +94,7 @@ func TestShouldOverwriteFileIfEmptyOnLoad(t *testing.T) {
 		t.Errorf("Expected error to be nil on result reading, but was %s", err)
 	}
 
-	if string(raw) != "[]" {
+	if string(raw) != "{}" {
 		t.Error("Unexpected content of result file!")
 	}
 
@@ -119,7 +120,7 @@ func TestShouldCreateFileIfDoesNotExistOnSave(t *testing.T) {
 		t.Errorf("Expected error to be nil on result reading, but was %s", err)
 	}
 
-	if string(raw) != "[]" {
+	if string(raw) != "{}" {
 		t.Error("Unexpected content of result file!")
 	}
 
@@ -136,7 +137,7 @@ func TestShouldNotCreateFileIfExistsAndNotEmptyOnSave(t *testing.T) {
 	}
 
 	defer os.Remove(RepositoryFileName)
-	file.WriteString("[]")
+	file.WriteString("{}")
 	file.Close()
 
 	repoMock := repositoryMock{}
@@ -190,6 +191,7 @@ func TestLoadOpenFileError(t *testing.T) {
 	decorator := RecoveryFileRepositoryDecorator{
 		repo: &repositoryMock{},
 		o:    func(s string, i int, fm os.FileMode) (*os.File, error) { return nil, errExpected },
+		mu:   &sync.Mutex{},
 	}
 	defer os.Remove(RepositoryFileName)
 
@@ -208,6 +210,7 @@ func TestSaveOpenFileError(t *testing.T) {
 	decorator := RecoveryFileRepositoryDecorator{
 		repo: &repositoryMock{},
 		o:    func(s string, i int, fm os.FileMode) (*os.File, error) { return nil, errExpected },
+		mu:   &sync.Mutex{},
 	}
 	defer os.Remove(RepositoryFileName)
 

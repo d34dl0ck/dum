@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"dum/machines/entities"
+	"dum/machines/cases"
 	"errors"
 	"io"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestNotFoundIfCannotFindMachineNameInUrl(t *testing.T) {
-	handler := NewReportHandler(nil, nil)
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
 	writerMock := responseWriter{
 		c: &writerResultContainer{},
 	}
@@ -28,7 +28,7 @@ func TestNotFoundIfCannotFindMachineNameInUrl(t *testing.T) {
 }
 
 func TestBadRequestIfRequestHasNotValidJsonBody(t *testing.T) {
-	handler := NewReportHandler(nil, nil)
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
 	writerMock := responseWriter{
 		c: &writerResultContainer{},
 	}
@@ -46,7 +46,7 @@ func TestBadRequestIfRequestHasNotValidJsonBody(t *testing.T) {
 }
 
 func TestBadRequestIfCannotDeserializeDto(t *testing.T) {
-	handler := NewReportHandler(nil, nil)
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
 	writerMock := responseWriter{
 		c: &writerResultContainer{},
 	}
@@ -64,7 +64,8 @@ func TestBadRequestIfCannotDeserializeDto(t *testing.T) {
 }
 
 func TestAccepted(t *testing.T) {
-	handler := NewReportHandler(notificationStrategy{}, repository{})
+	c := make(chan cases.Command, 1)
+	handler := NewReportHandler(nil, nil, c)
 	writerMock := responseWriter{
 		c: &writerResultContainer{},
 	}
@@ -79,28 +80,20 @@ func TestAccepted(t *testing.T) {
 	if writerMock.c.writtenStatusCode != 202 {
 		t.Errorf("Response code mismatch! Expected %d, but was %d!", 202, writerMock.c.writtenStatusCode)
 	}
-}
 
-func TestInternalServerError(t *testing.T) {
-	handler := NewReportHandler(notificationStrategy{}, repository{true})
-	writerMock := responseWriter{
-		c: &writerResultContainer{},
+	command, isOpen := <-c
+
+	if !isOpen {
+		t.Errorf("Channel should not be closed!")
 	}
 
-	url, _ := url.Parse("/api/v1/machines/test/report")
-	handler.ServeHTTP(writerMock, &http.Request{
-		URL:    url,
-		Method: http.MethodPost,
-		Body:   io.NopCloser(strings.NewReader("[{ \"duration\": \"30s\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }]")),
-	})
-
-	if writerMock.c.writtenStatusCode != 500 {
-		t.Errorf("Response code mismatch! Expected %d, but was %d!", 500, writerMock.c.writtenStatusCode)
+	if command == nil {
+		t.Errorf("Command shoult not be nil!")
 	}
 }
 
 func TestNotImplementedIfNotPostMethod(t *testing.T) {
-	handler := NewReportHandler(nil, nil)
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
 	writerMock := responseWriter{
 		c: &writerResultContainer{},
 	}
@@ -126,6 +119,23 @@ func TestNotImplementedIfNotPostMethod(t *testing.T) {
 	}
 }
 
+func BenchmarkHandler(b *testing.B) {
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command, b.N))
+	writerMock := responseWriter{
+		c: &writerResultContainer{},
+	}
+
+	url, _ := url.Parse("/api/v1/machines/test/report")
+
+	for i := 0; i < b.N; i++ {
+		handler.ServeHTTP(writerMock, &http.Request{
+			URL:    url,
+			Method: http.MethodPost,
+			Body:   io.NopCloser(strings.NewReader("[{ \"duration\": \"30s\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }]")),
+		})
+	}
+}
+
 type writerResultContainer struct {
 	writtenStatusCode int
 }
@@ -143,27 +153,5 @@ func (r responseWriter) Write([]byte) (int, error) {
 }
 
 func (r responseWriter) Header() http.Header {
-	return nil
-}
-
-type repository struct {
-	shouldFail bool
-}
-
-func (r repository) Load(name string) (*entities.Machine, error) {
-	if r.shouldFail {
-		return nil, errors.New("some error")
-	}
-
-	return nil, nil
-}
-
-func (r repository) Save(machine *entities.Machine) error {
-	return nil
-}
-
-type notificationStrategy struct{}
-
-func (s notificationStrategy) Notify(machineName string, level entities.HealthLevel) error {
 	return nil
 }

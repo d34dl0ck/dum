@@ -143,7 +143,7 @@ func TestEmptyLoad(t *testing.T) {
 
 	defer os.Remove(RepositoryFileName)
 	defer file.Close()
-	file.WriteString("[]")
+	file.WriteString("{}")
 
 	machine, err := repo.Load("some name")
 

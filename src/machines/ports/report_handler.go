@@ -16,6 +16,7 @@ type ReportHandler struct {
 	strategy           entities.HealthNotificationStrategy
 	repo               cases.MachineRepository
 	machineNamePattern regexp.Regexp
+	commandChan        chan<- cases.Command
 }
 
 func (h *ReportHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -63,20 +64,16 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 		MissingUpdates:       missingUpdates,
 	}
 
-	err = command.Execute()
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusAccepted)
-	}
+	h.commandChan <- &command
+	w.WriteHeader(http.StatusAccepted)
 }
 
-func NewReportHandler(s entities.HealthNotificationStrategy, r cases.MachineRepository) *ReportHandler {
+func NewReportHandler(s entities.HealthNotificationStrategy, r cases.MachineRepository, c chan<- cases.Command) *ReportHandler {
 	return &ReportHandler{
 		strategy:           s,
 		repo:               r,
 		machineNamePattern: *regexp.MustCompile(`^/api/v1/machines/(.*)/report`),
+		commandChan:        c,
 	}
 }
 
