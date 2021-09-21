@@ -19,11 +19,11 @@ So as this project is a pet-project, the author will try to use such patterns an
 
 The practical scenarios that system should support are displayed at the following diagram:
 
-![Cases](/diagrams/cases.jpg?raw=true)
+![Cases](/diagrams/cases.jpg)
 
 The system consists of the following components:
 
-![Components](/diagrams/components.jpg?raw=true)
+![Components](/diagrams/components.jpg)
 
 Components:
 * MachineService - service, allows to perform an operations with specific machine. Provides the ReportAPI interface, which is used for reporting about any updates, that are missing on the specific machine.
@@ -31,7 +31,7 @@ Components:
 
 Go modules:
 
-![Modules](/diagrams/modules.jpg?raw=true)
+![Modules](/diagrams/modules.jpg)
 
 Modules:
 * Machines - module, that implements MachineAPI component itself
