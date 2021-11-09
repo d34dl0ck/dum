@@ -1,8 +1,8 @@
 package adapters
 
 import (
-	"dum/machines/cases"
-	"dum/machines/entities"
+	"dum/internal/machines/cases"
+	"dum/internal/machines/entities"
 	"encoding/json"
 	"fmt"
 	"os"
