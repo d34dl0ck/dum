@@ -1,9 +1,9 @@
 package ports
 
 import (
-	"dum/contracts/machines/dto"
-	"dum/machines/cases"
-	"dum/machines/entities"
+	"dum/internal/machines/cases"
+	"dum/internal/machines/entities"
+	"dum/pkg/machines/contract"
 	"encoding/json"
 	"net/http"
 	"regexp"
@@ -37,7 +37,7 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 
 	name := matches[1]
 	dec := json.NewDecoder(r.Body)
-	var dtoSet []dto.MissingUpdate
+	var dtoSet []contract.MissingUpdate
 	err := dec.Decode(&dtoSet)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -77,7 +77,7 @@ func NewReportHandler(s entities.HealthNotificationStrategy, r cases.MachineRepo
 	}
 }
 
-func convert(dto dto.MissingUpdate) (entities.MissingUpdate, error) {
+func convert(dto contract.MissingUpdate) (entities.MissingUpdate, error) {
 	duration, err := time.ParseDuration(dto.Duration)
 
 	if err != nil {

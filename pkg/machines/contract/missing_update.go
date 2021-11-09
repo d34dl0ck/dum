@@ -1,4 +1,4 @@
-package dto
+package contract
 
 // Data transfer object for missing update value type
 type MissingUpdate struct {

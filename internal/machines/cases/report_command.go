@@ -1,6 +1,6 @@
 package cases
 
-import "dum/machines/entities"
+import "dum/internal/machines/entities"
 
 // Command for reporting about some missing updates of some machine.
 type ReportCommand struct {

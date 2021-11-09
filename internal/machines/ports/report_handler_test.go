@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"dum/machines/cases"
+	"dum/internal/machines/cases"
 	"errors"
 	"io"
 	"net/http"

@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"dum/machines/adapters"
-	"dum/machines/cases"
-	"dum/machines/ports"
+	"dum/internal/machines/adapters"
+	"dum/internal/machines/cases"
+	"dum/internal/machines/ports"
 	"log"
 	"net/http"
 	"os"

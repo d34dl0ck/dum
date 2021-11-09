@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dum/machines/cases"
-	"dum/machines/ports"
+	"dum/internal/machines/cases"
+	"dum/internal/machines/ports"
 	"testing"
 )
 
