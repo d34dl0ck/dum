@@ -1,6 +1,6 @@
 package cases
 
-import "dum/machines/entities"
+import "dum/internal/machines/entities"
 
 // Interface for accessing and persisting machine entities. Should implement optimistic locking strategy
 // to support horizontal scaling of service.

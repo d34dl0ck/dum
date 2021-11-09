@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dum/machines/adapters"
-	"dum/machines/ports"
+	"dum/internal/machines/adapters"
+	"dum/internal/machines/ports"
 	"log"
 	"net/http"
 )

@@ -1,7 +1,7 @@
 package adapters
 
 import (
-	"dum/machines/entities"
+	"dum/internal/machines/entities"
 	"encoding/json"
 	"errors"
 	"os"

@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"dum/machines/entities"
+	"dum/internal/machines/entities"
 	"errors"
 	"io"
 	"net/http"

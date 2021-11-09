@@ -1,7 +1,7 @@
 package cases
 
 import (
-	"dum/machines/entities"
+	"dum/internal/machines/entities"
 	"errors"
 	"testing"
 )
