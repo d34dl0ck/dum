@@ -35,10 +35,15 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	name := matches[1]
+	id, err := uuid.Parse(matches[1])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	dec := json.NewDecoder(r.Body)
-	var dtoSet []contract.MissingUpdate
-	err := dec.Decode(&dtoSet)
+	var request contract.ReportRequest
+	err = dec.Decode(&request)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -46,7 +51,7 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 
 	var missingUpdates []entities.MissingUpdate
 
-	for _, dto := range dtoSet {
+	for _, dto := range request.MissingUpdates {
 		missingUpdate, err := convert(dto)
 
 		if err != nil {
@@ -58,10 +63,11 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 	}
 
 	command := cases.ReportCommand{
-		MachineName:          name,
+		MachineName:          request.MachineName,
 		Repository:           h.repo,
 		NotificationStrategy: h.strategy,
 		MissingUpdates:       missingUpdates,
+		MachineId:            entities.MachineId(id),
 	}
 
 	h.commandChan <- &command

@@ -15,6 +15,13 @@ type MissingUpdate struct {
 	Duration time.Duration
 }
 
+// Type for machine identifier. There can be many machines with the same name, but different Id.
+type MachineId uuid.UUID
+
+func (id MachineId) String() string {
+	return uuid.UUID(id).String()
+}
+
 // Severity represents a level of update importance.
 type Severity int
 
@@ -31,16 +38,18 @@ const (
 type Machine struct {
 	h       health
 	Name    string
+	Id      MachineId
 	missing []MissingUpdate
 }
 
 // Creates a machine with specific missing updates and health level.
-func CreateMachine(name string, mu []MissingUpdate) *Machine {
+func CreateMachine(id MachineId, name string, mu []MissingUpdate) *Machine {
 	health := &health{}
 
 	return &Machine{
 		Name:    name,
 		h:       health.Recalculate(mu),
+		Id:      id,
 		missing: mu,
 	}
 }
@@ -59,7 +68,7 @@ func (m *Machine) GetMissingUpdates() []MissingUpdate {
 func (m *Machine) Report(mu []MissingUpdate, s HealthNotificationStrategy) error {
 	m.h = m.h.Recalculate(mu)
 	m.missing = mu
-	err := s.Notify(m.Name, m.h.level)
+	err := s.Notify(m.Id, m.h.level)
 
 	if err != nil {
 		return err

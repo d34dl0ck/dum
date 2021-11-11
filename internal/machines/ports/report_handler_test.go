@@ -27,6 +27,24 @@ func TestNotFoundIfCannotFindMachineNameInUrl(t *testing.T) {
 	}
 }
 
+func TestBadRequestIfRequestHasNotValidId(t *testing.T) {
+	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
+	writerMock := responseWriter{
+		c: &writerResultContainer{},
+	}
+
+	url, _ := url.Parse("/api/v1/machines/test/report")
+	handler.ServeHTTP(writerMock, &http.Request{
+		URL:    url,
+		Method: http.MethodPost,
+		Body:   io.NopCloser(strings.NewReader("not_a_json")),
+	})
+
+	if writerMock.c.writtenStatusCode != 400 {
+		t.Errorf("Response code mismatch! Expected %d, but was %d!", 400, writerMock.c.writtenStatusCode)
+	}
+}
+
 func TestBadRequestIfRequestHasNotValidJsonBody(t *testing.T) {
 	handler := NewReportHandler(nil, nil, make(chan<- cases.Command))
 	writerMock := responseWriter{
@@ -51,11 +69,11 @@ func TestBadRequestIfCannotDeserializeDto(t *testing.T) {
 		c: &writerResultContainer{},
 	}
 
-	url, _ := url.Parse("/api/v1/machines/test/report")
+	url, _ := url.Parse("/api/v1/machines/1a3fccff-2d7b-45f0-a3c4-50a7bb50d06d/report")
 	handler.ServeHTTP(writerMock, &http.Request{
 		URL:    url,
 		Method: http.MethodPost,
-		Body:   io.NopCloser(strings.NewReader("[{ \"duration\": \"dadwwadwa\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }]")),
+		Body:   io.NopCloser(strings.NewReader("{ \"MachineName\": \"test\", \"MissingUpdates\": [{ \"duration\": \"dadwwadwa\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }] }")),
 	})
 
 	if writerMock.c.writtenStatusCode != 400 {
@@ -70,11 +88,11 @@ func TestAccepted(t *testing.T) {
 		c: &writerResultContainer{},
 	}
 
-	url, _ := url.Parse("/api/v1/machines/test/report")
+	url, _ := url.Parse("/api/v1/machines/1a3fccff-2d7b-45f0-a3c4-50a7bb50d06e/report")
 	handler.ServeHTTP(writerMock, &http.Request{
 		URL:    url,
 		Method: http.MethodPost,
-		Body:   io.NopCloser(strings.NewReader("[{ \"duration\": \"30s\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }]")),
+		Body:   io.NopCloser(strings.NewReader("{ \"MachineName\": \"test\", \"MissingUpdates\": [{ \"duration\": \"30s\", \"updateId\": \"1a3fccff-2d7b-45f0-a3c4-50a7bb50d06c\", \"severity\": 2 }] }")),
 	})
 
 	if writerMock.c.writtenStatusCode != 202 {
@@ -88,7 +106,7 @@ func TestAccepted(t *testing.T) {
 	}
 
 	if command == nil {
-		t.Errorf("Command shoult not be nil!")
+		t.Errorf("Command should not be nil!")
 	}
 }
 

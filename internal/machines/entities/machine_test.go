@@ -3,11 +3,12 @@ package entities
 import (
 	"errors"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestReport(t *testing.T) {
 	strategyMock := &notificationStrategy{
-		reportedMachineName: "",
 		reportedHealthLevel: -1,
 	}
 
@@ -28,10 +29,13 @@ func TestReport(t *testing.T) {
 	}
 
 	for _, testCase := range cases {
+		expectedId := MachineId(uuid.New())
+
 		machine := Machine{
 			h:       health{Healthy},
 			missing: []MissingUpdate{},
 			Name:    machineName,
+			Id:      expectedId,
 		}
 
 		expectedMissingUpdates := createMissingUpdates(testCase.severities...)
@@ -47,8 +51,8 @@ func TestReport(t *testing.T) {
 			t.Errorf("Report should change machine health level to expected %d, but was %d", testCase.expectedLevel, actualLevel)
 		}
 
-		if strategyMock.reportedMachineName != machineName {
-			t.Errorf("Strategy was reported with wrong machine name, expected %s, but was %s", machineName, strategyMock.reportedMachineName)
+		if strategyMock.reportedMachineId != expectedId {
+			t.Errorf("Strategy was reported with wrong machine id, expected %s, but was %s", expectedId, strategyMock.reportedMachineId)
 		}
 
 		if strategyMock.reportedHealthLevel != testCase.expectedLevel {
@@ -115,11 +119,16 @@ func TestGetMissingUpdates(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
+	id := MachineId(uuid.New())
 	mu := createMissingUpdates([]Severity{Critical, Important}...)
-	machine := CreateMachine(machineName, mu)
+	machine := CreateMachine(id, machineName, mu)
 
 	if machine.Name != machineName {
 		t.Errorf("New machine shoud have expected name %s, but was %s", machineName, machine.Name)
+	}
+
+	if machine.Id != id {
+		t.Errorf("New machine shoud have expected id %s, but was %s", id, machine.Id)
 	}
 
 	if !compareMissingUpdates(mu, machine.GetMissingUpdates()) {
@@ -128,7 +137,7 @@ func TestCreate(t *testing.T) {
 }
 
 func BenchmarkReport(b *testing.B) {
-	machine := CreateMachine(machineName, []MissingUpdate{})
+	machine := CreateMachine(MachineId(uuid.New()), machineName, []MissingUpdate{})
 	mu := createMissingUpdates([]Severity{Critical, Important}...)
 	for i := 0; i < b.N; i++ {
 		machine.Report(mu, &notificationStrategy{})
@@ -136,17 +145,17 @@ func BenchmarkReport(b *testing.B) {
 }
 
 type notificationStrategy struct {
-	reportedMachineName string
+	reportedMachineId   MachineId
 	reportedHealthLevel HealthLevel
 	shouldReturnError   bool
 }
 
-func (s *notificationStrategy) Notify(machineName string, level HealthLevel) error {
+func (s *notificationStrategy) Notify(machineId MachineId, level HealthLevel) error {
 	if s.shouldReturnError {
 		return errReport
 	}
 
-	s.reportedMachineName = machineName
+	s.reportedMachineId = machineId
 	s.reportedHealthLevel = level
 	return nil
 }

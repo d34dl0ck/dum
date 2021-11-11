@@ -31,6 +31,12 @@ foreach ($update in $updates) {
 }
 
 $machineName = $env:computername
-$reportUri = "http://localhost:3000/api/v1/machines/" + $machineName + "/report"
 
-Invoke-WebRequest -Uri $reportUri -Method POST -Body ($dtoSet|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
+$request = [pscustomobject]@{
+    MachineName = $machineName;
+    MissingUpdates = $dtoSet;
+}
+
+$reportUri = "http://localhost:3000/api/v1/machines/ca885edc-60ac-4b1e-9679-b8921ab4bb30/report"
+
+Invoke-WebRequest -Uri $reportUri -Method POST -Body ($request|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing

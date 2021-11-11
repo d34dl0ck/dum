@@ -25,13 +25,16 @@ func TestSuccessSaveLoad(t *testing.T) {
 
 	defer os.Remove(RepositoryFileName)
 	defer file.Close()
-	machine := entities.CreateMachine("testName", []entities.MissingUpdate{
-		{
-			UpdateId: uuid.New(),
-			Severity: entities.Critical,
-			Duration: time.Hour,
-		},
-	})
+	machine := entities.CreateMachine(
+		entities.MachineId(uuid.New()),
+		"testName",
+		[]entities.MissingUpdate{
+			{
+				UpdateId: uuid.New(),
+				Severity: entities.Critical,
+				Duration: time.Hour,
+			},
+		})
 
 	err = repo.Save(machine)
 	if err != nil {
@@ -39,10 +42,14 @@ func TestSuccessSaveLoad(t *testing.T) {
 		return
 	}
 
-	loadedMachine, err := repo.Load(machine.Name)
+	loadedMachine, err := repo.Load(machine.Id)
 	if err != nil {
 		t.Errorf("Failed to load machine, because of error %s", err)
 		return
+	}
+
+	if loadedMachine.Id != machine.Id {
+		t.Errorf("Machine ID mismatch! Expected %s, but was %s", machine.Id.String(), loadedMachine.Id.String())
 	}
 
 	if loadedMachine.Name != machine.Name {
@@ -82,13 +89,16 @@ func TestOptimisticLockError(t *testing.T) {
 
 	defer os.Remove(RepositoryFileName)
 	defer file.Close()
-	machine := entities.CreateMachine("testName", []entities.MissingUpdate{
-		{
-			UpdateId: uuid.New(),
-			Severity: entities.Critical,
-			Duration: time.Hour,
-		},
-	})
+	machine := entities.CreateMachine(
+		entities.MachineId(uuid.New()),
+		"testName",
+		[]entities.MissingUpdate{
+			{
+				UpdateId: uuid.New(),
+				Severity: entities.Critical,
+				Duration: time.Hour,
+			},
+		})
 
 	_ = repo.Save(machine)
 	repo = NewFileRepository()
@@ -120,7 +130,7 @@ func TestBrokenJsonLoadError(t *testing.T) {
 	defer file.Close()
 	file.WriteString("not a json")
 
-	machine, err := repo.Load("some name")
+	machine, err := repo.Load(entities.MachineId(uuid.New()))
 
 	if machine != nil {
 		t.Errorf("Machine should be nil!")
@@ -145,7 +155,7 @@ func TestEmptyLoad(t *testing.T) {
 	defer file.Close()
 	file.WriteString("{}")
 
-	machine, err := repo.Load("some name")
+	machine, err := repo.Load(entities.MachineId(uuid.New()))
 
 	if machine != nil {
 		t.Errorf("Machine should be nil!")
@@ -159,7 +169,7 @@ func TestEmptyLoad(t *testing.T) {
 func TestNoFileLoadError(t *testing.T) {
 	repo := NewFileRepository()
 
-	machine, err := repo.Load("some name")
+	machine, err := repo.Load(entities.MachineId(uuid.New()))
 
 	if machine != nil {
 		t.Errorf("Machine should be nil!")
@@ -199,13 +209,16 @@ func TestSerializationError(t *testing.T) {
 
 	defer os.Remove(RepositoryFileName)
 	defer file.Close()
-	machine := entities.CreateMachine("testName", []entities.MissingUpdate{
-		{
-			UpdateId: uuid.New(),
-			Severity: entities.Critical,
-			Duration: time.Hour,
-		},
-	})
+	machine := entities.CreateMachine(
+		entities.MachineId(uuid.New()),
+		"testName",
+		[]entities.MissingUpdate{
+			{
+				UpdateId: uuid.New(),
+				Severity: entities.Critical,
+				Duration: time.Hour,
+			},
+		})
 
 	err = repo.Save(machine)
 	if err == nil {
@@ -237,13 +250,16 @@ func TestFileWriteError(t *testing.T) {
 
 	defer os.Remove(RepositoryFileName)
 	defer file.Close()
-	machine := entities.CreateMachine("testName", []entities.MissingUpdate{
-		{
-			UpdateId: uuid.New(),
-			Severity: entities.Critical,
-			Duration: time.Hour,
-		},
-	})
+	machine := entities.CreateMachine(
+		entities.MachineId(uuid.New()),
+		"testName",
+		[]entities.MissingUpdate{
+			{
+				UpdateId: uuid.New(),
+				Severity: entities.Critical,
+				Duration: time.Hour,
+			},
+		})
 
 	err = repo.Save(machine)
 	if err == nil {
