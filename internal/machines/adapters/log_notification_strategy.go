@@ -10,8 +10,8 @@ type LogNotificationStrategy struct {
 	logger *log.Logger
 }
 
-func (s LogNotificationStrategy) Notify(machineName string, level entities.HealthLevel) error {
-	s.logger.Printf(template, machineName, level)
+func (s LogNotificationStrategy) Notify(id entities.MachineId, level entities.HealthLevel) error {
+	s.logger.Printf(template, id, level)
 	return nil
 }
 

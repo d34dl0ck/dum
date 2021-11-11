@@ -39,7 +39,7 @@ type FileRepository struct {
 // Machine entity version for changes tracking.
 type MachineVersion string
 
-func (r *FileRepository) Load(name string) (*entities.Machine, error) {
+func (r *FileRepository) Load(id entities.MachineId) (*entities.Machine, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	dtoSet, err := r.loadAll()
@@ -48,8 +48,8 @@ func (r *FileRepository) Load(name string) (*entities.Machine, error) {
 	}
 
 	for _, dto := range dtoSet {
-		if dto.Name == name {
-			r.versionsMap[dto.Name] = MachineVersion(dto.Version)
+		if dto.Id == id.String() {
+			r.versionsMap[dto.Id] = MachineVersion(dto.Version)
 			return dto.toMachine(), nil
 		}
 	}
@@ -67,7 +67,7 @@ func (r *FileRepository) Save(machine *entities.Machine) error {
 	}
 
 	for _, dto := range dtoSet {
-		if dto.Name == machine.Name && MachineVersion(dto.Version) != r.versionsMap[machine.Name] {
+		if dto.Id == machine.Id.String() && MachineVersion(dto.Version) != r.versionsMap[machine.Id.String()] {
 			return fmt.Errorf("optimistic lock occured! Expected %s version, but was %s version", r.versionsMap[machine.Name], dto.Version)
 		}
 	}
@@ -85,8 +85,9 @@ func (r *FileRepository) Save(machine *entities.Machine) error {
 		Name:           machine.Name,
 		MissingUpdates: missingUpdateDtoSet,
 		Version:        uuid.NewString(),
+		Id:             machine.Id.String(),
 	}
-	dtoSet[machine.Name] = machineDto
+	dtoSet[machine.Id.String()] = machineDto
 
 	raw, err := r.s(&dtoSet)
 	if err != nil {
@@ -97,7 +98,7 @@ func (r *FileRepository) Save(machine *entities.Machine) error {
 	if err != nil {
 		return err
 	}
-	r.versionsMap[machine.Name] = MachineVersion(machineDto.Version)
+	r.versionsMap[machine.Id.String()] = MachineVersion(machineDto.Version)
 	return nil
 }
 
@@ -149,8 +150,8 @@ func (m missingUpdateDto) toMissingUpdate() entities.MissingUpdate {
 
 // Data transfer object for machine entity.
 type machineDto struct {
-	Name, Version  string
-	MissingUpdates []missingUpdateDto
+	Id, Name, Version string
+	MissingUpdates    []missingUpdateDto
 }
 
 func (m machineDto) toMachine() *entities.Machine {
@@ -161,6 +162,7 @@ func (m machineDto) toMachine() *entities.Machine {
 	}
 
 	return entities.CreateMachine(
+		entities.MachineId(uuid.MustParse(m.Id)),
 		m.Name,
 		missingUpdates,
 	)

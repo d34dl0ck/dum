@@ -6,3 +6,9 @@ type MissingUpdate struct {
 	Severity int
 	Duration string
 }
+
+// Data transfer object for report request
+type ReportRequest struct {
+	MachineName    string
+	MissingUpdates []MissingUpdate
+}

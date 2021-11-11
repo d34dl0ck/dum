@@ -5,6 +5,8 @@ import (
 	"os"
 	"sync"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestShouldCreateFileIfDoesNotExistOnLoad(t *testing.T) {
@@ -12,7 +14,7 @@ func TestShouldCreateFileIfDoesNotExistOnLoad(t *testing.T) {
 	repoMock := repositoryMock{}
 	decorator := NewRecoveryFileRepositoryDecorator(&repoMock)
 
-	machine, err := decorator.Load("")
+	machine, err := decorator.Load(entities.MachineId(uuid.New()))
 
 	if machine != expectedMachine {
 		t.Errorf("Machine mismatch!")
@@ -51,7 +53,7 @@ func TestShouldNotCreateFileIfExistsAndNotEmptyOnLoad(t *testing.T) {
 	repoMock := repositoryMock{}
 	decorator := NewRecoveryFileRepositoryDecorator(&repoMock)
 
-	machine, err := decorator.Load("")
+	machine, err := decorator.Load(entities.MachineId(uuid.New()))
 
 	if machine != expectedMachine {
 		t.Errorf("Machine mismatch!")
@@ -78,7 +80,7 @@ func TestShouldOverwriteFileIfEmptyOnLoad(t *testing.T) {
 	repoMock := repositoryMock{}
 	decorator := NewRecoveryFileRepositoryDecorator(&repoMock)
 
-	machine, err := decorator.Load("")
+	machine, err := decorator.Load(entities.MachineId(uuid.New()))
 
 	if machine != expectedMachine {
 		t.Errorf("Machine mismatch!")
@@ -195,7 +197,7 @@ func TestLoadOpenFileError(t *testing.T) {
 	}
 	defer os.Remove(RepositoryFileName)
 
-	_, err := decorator.Load("some_name")
+	_, err := decorator.Load(entities.MachineId(uuid.New()))
 
 	if err == nil {
 		t.Error("Expected err but was nil!")
@@ -269,7 +271,7 @@ type repositoryMock struct {
 	isLoaded     bool
 }
 
-func (r *repositoryMock) Load(name string) (*entities.Machine, error) {
+func (r *repositoryMock) Load(id entities.MachineId) (*entities.Machine, error) {
 	r.isLoaded = true
 	return expectedMachine, nil
 }

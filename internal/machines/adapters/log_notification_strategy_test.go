@@ -7,9 +7,12 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestLogWriting(t *testing.T) {
+	expectedId := entities.MachineId(uuid.New())
 	file, err := os.Create(testFile)
 
 	if err != nil {
@@ -20,7 +23,7 @@ func TestLogWriting(t *testing.T) {
 	defer file.Close()
 
 	strategy := NewLogNotificationStrategy(log.New(file, "", 0))
-	err = strategy.Notify(machineName, healthLevel)
+	err = strategy.Notify(expectedId, healthLevel)
 
 	if err != nil {
 		t.Errorf("Expected nil err, but was %s", err)
@@ -34,7 +37,7 @@ func TestLogWriting(t *testing.T) {
 		return
 	}
 
-	expected := fmt.Sprintf(template, machineName, healthLevel)
+	expected := fmt.Sprintf(template, expectedId.String(), healthLevel)
 	actual := strings.Trim(string(raw), "\t\n\r")
 
 	if actual != expected {
@@ -43,5 +46,4 @@ func TestLogWriting(t *testing.T) {
 }
 
 const testFile string = "log_test.txt"
-const machineName string = "some machine name"
 const healthLevel entities.HealthLevel = entities.Warning

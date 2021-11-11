@@ -16,7 +16,7 @@ type RecoveryFileRepositoryDecorator struct {
 	ofw  func(*os.File, string) (int, error)
 }
 
-func (r *RecoveryFileRepositoryDecorator) Load(name string) (*entities.Machine, error) {
+func (r *RecoveryFileRepositoryDecorator) Load(id entities.MachineId) (*entities.Machine, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	err := r.createFileIfNotExists()
@@ -25,7 +25,7 @@ func (r *RecoveryFileRepositoryDecorator) Load(name string) (*entities.Machine, 
 		return nil, err
 	}
 
-	return r.repo.Load(name)
+	return r.repo.Load(id)
 }
 
 func (r *RecoveryFileRepositoryDecorator) Save(machine *entities.Machine) error {

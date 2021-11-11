@@ -4,6 +4,8 @@ import (
 	"dum/internal/machines/entities"
 	"errors"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestExecuteForNewMachine(t *testing.T) {
@@ -46,7 +48,7 @@ func TestExecuteForNewMachine(t *testing.T) {
 func TestExecuteForExistingMachine(t *testing.T) {
 	strategyMock := notificationStrategyMock{}
 	repositoryMock := repositoryMock{
-		loadedMachine:         entities.CreateMachine(existingMachineName, []entities.MissingUpdate{}),
+		loadedMachine:         entities.CreateMachine(entities.MachineId(uuid.New()), existingMachineName, []entities.MissingUpdate{}),
 		shouldReturnLoadError: false,
 	}
 
@@ -177,7 +179,7 @@ type notificationStrategyMock struct {
 	wasCalled         bool
 }
 
-func (m *notificationStrategyMock) Notify(machineName string, level entities.HealthLevel) error {
+func (m *notificationStrategyMock) Notify(id entities.MachineId, level entities.HealthLevel) error {
 	m.wasCalled = true
 
 	if m.shouldReturnError {
@@ -194,7 +196,7 @@ type repositoryMock struct {
 	shouldReturnSaveError bool
 }
 
-func (r *repositoryMock) Load(name string) (*entities.Machine, error) {
+func (r *repositoryMock) Load(id entities.MachineId) (*entities.Machine, error) {
 	if r.shouldReturnLoadError {
 		return nil, errLoad
 	}
