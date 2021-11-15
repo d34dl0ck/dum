@@ -37,6 +37,8 @@ $request = [pscustomobject]@{
     MissingUpdates = $dtoSet;
 }
 
+Write-Host "Sending report ..."
 $reportUri = "http://localhost:3000/api/v1/machines/ca885edc-60ac-4b1e-9679-b8921ab4bb30/report"
+Write-Host "Sent!"
 
 Invoke-WebRequest -Uri $reportUri -Method POST -Body ($request|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing

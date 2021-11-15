@@ -73,7 +73,10 @@ func startServer(s *http.Server) {
 }
 
 func createHandler(c chan cases.Command) http.Handler {
-	s := adapters.NewLogNotificationStrategy(log.Default())
+	// s := adapters.NewLogNotificationStrategy(log.Default())
+	s := adapters.RabbitNotifictionStrategy{
+		RabbitUrl: "amqp://guest:guest@172.17.0.2:5672/",
+	}
 	r := adapters.NewFileRepository()
 	d := adapters.NewRecoveryFileRepositoryDecorator(r)
 

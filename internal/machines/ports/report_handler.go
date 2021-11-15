@@ -3,7 +3,7 @@ package ports
 import (
 	"dum/internal/machines/cases"
 	"dum/internal/machines/entities"
-	"dum/pkg/machines/contract"
+	"dum/pkg/machines/report"
 	"encoding/json"
 	"net/http"
 	"regexp"
@@ -42,7 +42,7 @@ func (h *ReportHandler) reportMissingUpdates(w http.ResponseWriter, r *http.Requ
 	}
 
 	dec := json.NewDecoder(r.Body)
-	var request contract.ReportRequest
+	var request report.ReportRequest
 	err = dec.Decode(&request)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -83,7 +83,7 @@ func NewReportHandler(s entities.HealthNotificationStrategy, r cases.MachineRepo
 	}
 }
 
-func convert(dto contract.MissingUpdate) (entities.MissingUpdate, error) {
+func convert(dto report.MissingUpdate) (entities.MissingUpdate, error) {
 	duration, err := time.ParseDuration(dto.Duration)
 
 	if err != nil {

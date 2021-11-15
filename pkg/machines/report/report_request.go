@@ -1,4 +1,4 @@
-package contract
+package report
 
 // Data transfer object for missing update value type
 type MissingUpdate struct {
